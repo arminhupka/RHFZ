@@ -34,6 +34,7 @@ interface IRHFZProviderProps<FormFields, FormResponse, FormReject> {
     schema: ZodEffects<ZodObject<any>> | ZodObject<any> | any
     defaultValues: DefaultValues<FormFields>
     children: ReactNode
+    mode?: 'onBlur' | 'onChange' | 'onSubmit' | undefined
     reValidateMode?: 'onBlur' | 'onChange' | 'onSubmit' | undefined
     onSubmit: (formData: FormFields) => Promise<FormResponse>
     onSuccess?: (
@@ -53,6 +54,7 @@ export const RHFZProvider = <
     children,
     defaultValues,
     schema,
+    mode,
     reValidateMode,
     onSubmit,
     onError,
@@ -69,8 +71,9 @@ export const RHFZProvider = <
 
     const form = useForm<FormField>({
         defaultValues,
-        resolver: zodResolver(schema),
+        mode,
         reValidateMode,
+        resolver: zodResolver(schema),
     })
 
     const handler: SubmitHandler<FormField> = (formData) => {
