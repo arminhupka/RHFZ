@@ -42,6 +42,7 @@ interface IRHFZProviderProps<FormFields, FormResponse, FormReject> {
     ) => void | Promise<void>
     onError?: (reject: FormReject, formData: FormFields) => void | Promise<void>
     onDone?: (formData: FormFields) => void | Promise<void>
+    resetOnSuccess?: boolean
 }
 
 export const RHFZProvider = <
@@ -57,6 +58,7 @@ export const RHFZProvider = <
     onError,
     onSuccess,
     onDone,
+    resetOnSuccess,
 }: IRHFZProviderProps<FormField, FormResponse, FormReject>) => {
     const [formState, setFormState] = useState<IRHPZDefaultData<FormResponse>>({
         isSubmitting: false,
@@ -71,7 +73,7 @@ export const RHFZProvider = <
         reValidateMode,
     })
 
-    const handler: SubmitHandler<FormField> = (data) => {
+    const handler: SubmitHandler<FormField> = (formData) => {
         setFormState((prev) => ({
             ...prev,
             isSubmitting: true,
@@ -79,7 +81,7 @@ export const RHFZProvider = <
             isSubmitError: false,
             formResponse: null,
         }))
-        onSubmit(data)
+        onSubmit(formData)
             .then((response) => {
                 setFormState((prev) => ({
                     ...prev,
@@ -87,7 +89,10 @@ export const RHFZProvider = <
                     isSubmittedSuccessfully: true,
                     formResponse: response,
                 }))
-                onSuccess?.(response, data)
+                onSuccess?.(response, formData)
+                if (resetOnSuccess) {
+                    form.reset()
+                }
             })
             .catch((error) => {
                 setFormState((prev) => ({
@@ -95,14 +100,14 @@ export const RHFZProvider = <
                     isSubmitting: false,
                     isSubmitError: true,
                 }))
-                onError?.(error, data)
+                onError?.(error, formData)
             })
             .finally(() => {
                 setFormState((prev) => ({
                     ...prev,
                     isSubmitting: false,
                 }))
-                onDone?.(data)
+                onDone?.(formData)
             })
     }
 
