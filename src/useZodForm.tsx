@@ -7,7 +7,7 @@ import {
     SubmitHandler,
     useForm,
 } from 'react-hook-form'
-import { ZodEffects, ZodObject } from 'zod/v3'
+import { ZodEffects, ZodObject } from 'zod'
 
 interface IRHPZDefaultData<FormResponse = unknown> {
     isSubmitting: boolean
