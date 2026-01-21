@@ -13,7 +13,7 @@ import {
 	type SubmitHandler,
 	useForm,
 } from "react-hook-form";
-import type { ZodEffects, ZodObject } from "zod";
+import type { z } from "zod";
 
 interface IRHPZDefaultData<FormResponse = unknown> {
 	isSubmitting: boolean;
@@ -37,14 +37,15 @@ export const useRHZPContex = <FormResponse = unknown>() =>
 	useContext(RHZPContext) as IRHPZDefaultData<FormResponse>;
 
 interface IRHFZProviderProps<FormFields, FormResponse, FormReject> {
-	schema: ZodEffects<ZodObject<any>> | ZodObject<any> | any;
+	// eslint-disable-next-line -- Schema może być dowolnego typu Zod zgodnie z wymaganiami zodResolver
+	schema: z.ZodType<any, any, any>;
 	defaultValues: DefaultValues<FormFields>;
 	children: ReactNode;
 	mode?: "onBlur" | "onChange" | "onSubmit" | undefined;
 	reValidateMode?: "onBlur" | "onChange" | "onSubmit" | undefined;
-	onSubmit: (formData: FormFields) => Promise<void>;
+	onSubmit: (formData: FormFields) => Promise<FormResponse>;
 	onSuccess?: (
-		reponse: FormResponse,
+		response: FormResponse,
 		formData: FormFields,
 	) => void | Promise<void>;
 	onError?: (reject: FormReject, formData: FormFields) => void | Promise<void>;
@@ -120,7 +121,7 @@ export const RHFZProvider = <
 			});
 	};
 
-	const value = useMemo<IRHPZDefaultData>(
+	const value = useMemo<IRHPZDefaultData<FormResponse>>(
 		() => ({
 			...formState,
 		}),
