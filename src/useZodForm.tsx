@@ -51,6 +51,7 @@ interface IRHFZProviderProps<FormFields, FormResponse, FormReject> {
 	onError?: (reject: FormReject, formData: FormFields) => void | Promise<void>;
 	onDone?: (formData: FormFields) => void | Promise<void>;
 	resetOnSuccess?: boolean;
+	renderOnlyChildren?: boolean;
 }
 
 export const RHFZProvider = <
@@ -68,6 +69,7 @@ export const RHFZProvider = <
 	onSuccess,
 	onDone,
 	resetOnSuccess,
+	renderOnlyChildren,
 }: IRHFZProviderProps<FormField, FormResponse, FormReject>) => {
 	const [formState, setFormState] = useState<IRHPZDefaultData<FormResponse>>({
 		isSubmitting: false,
@@ -131,9 +133,13 @@ export const RHFZProvider = <
 	return (
 		<RHZPContext.Provider value={value}>
 			<FormProvider {...form}>
-				<form noValidate={true} onSubmit={form.handleSubmit(handler)}>
-					{children}
-				</form>
+				{renderOnlyChildren ? (
+					children
+				) : (
+					<form noValidate={true} onSubmit={form.handleSubmit(handler)}>
+						{children}
+					</form>
+				)}
 			</FormProvider>
 		</RHZPContext.Provider>
 	);
